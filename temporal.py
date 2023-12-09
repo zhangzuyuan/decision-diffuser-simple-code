@@ -209,6 +209,7 @@ class TemporalUnet(nn.Module):
         t = self.time_mlp(time)
 
         if self.returns_condition:
+            # print(returns)
             assert returns is not None
             returns_embed = self.returns_mlp(returns)
             if use_dropout:

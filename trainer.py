@@ -51,7 +51,7 @@ class Trainer(object):
         dataset,
         # renderer,
         ema_decay=0.995,
-        train_batch_size=32,
+        train_batch_size=256,
         train_lr=2e-5,
         gradient_accumulate_every=2,
         step_start_ema=2000,
@@ -112,13 +112,14 @@ class Trainer(object):
         # timer = Timer()
         tmp_loss = 0
         for step in range(n_train_steps):
-            tmp_loss = 0
+            # tmp_loss = 0
             for batch in data_iter(self.batch_size, self.dataset):
                 # print(batch)
-                x=torch.tensor(batch.trajectories,dtype=torch.float32)
-                cond = {0:torch.tensor(batch.conditions[0])}
-                returns = torch.tensor(batch.returns,dtype=torch.float32)
+                x=torch.tensor(batch.trajectories,dtype=torch.float32,device='cuda')
+                cond = {0:torch.tensor(batch.conditions[0],device='cuda')}
+                returns = torch.tensor(batch.returns,dtype=torch.float32,device='cuda')
                 # batch = batch_to_device(batch, device=self.device)
+                # loss, infos = self.model.loss(*batch)
                 loss, infos = self.model.loss(x, cond, returns)
                 loss = loss / self.gradient_accumulate_every
                 loss.backward()
@@ -126,7 +127,7 @@ class Trainer(object):
 
             self.optimizer.step()
             self.optimizer.zero_grad()
-            print(tmp_loss)
+            # print(tmp_loss)
 
             if self.step % self.update_ema_every == 0:
                 self.step_ema()
@@ -154,3 +155,4 @@ class Trainer(object):
             #         self.render_samples()
 
             self.step += 1
+        return tmp_loss
