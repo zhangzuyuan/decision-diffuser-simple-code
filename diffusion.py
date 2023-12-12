@@ -653,7 +653,7 @@ class ARInvModel(nn.Module):
         # print(a)
         a = torch.cat(a, dim=1)
         # print(a)
-        a = torch.softmax(a,dim=1)
+        # a = torch.softmax(a,dim=1)
         # print(a)
         return a
     
